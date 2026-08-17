@@ -18,21 +18,21 @@ int main() {
     body_param body {_height_cm, _weight_kg};
     model::set_body_param(body);
 
+    constexpr std::size_t _model_count =pr3_values.size() * pr4_values.size() * pr7_values.size();
+
     std::vector<model> models;
-    models.resize(490);
+    models.reserve(_model_count);
 
-    std::vector<error_record> _errors;
-    _errors.reserve(32);
-
-    //model prepare logic...
-    size_t idx = 0;
-    for (const auto pr3 : pr3_values) {
-        for (const auto pr4 : pr4_values) {
-            for (const auto pr7 : pr7_values) {
-                models[idx++] = model{param{pr3, pr4, pr7}};
+    for (double p3 : pr3_values) {
+        for (double p4 : pr4_values) {
+            for (double p7 : pr7_values) {
+                models.emplace_back(param {p3, p4, p7});
             }
         }
     }
+
+    std::vector<error_record> _errors;
+    _errors.reserve(32);
 
     bool _first_flag = true;
     double _prev_temp_skin = 0;
@@ -101,7 +101,8 @@ int main() {
             size_t index = 0;
             for (auto& _model : models) {
                 double _error = _model.mean_error(_step_count);
-                if (_error < _select_distance) {
+
+                if (std::isfinite(_error) &&_error <= _select_distance) {
                     _candidate_count++;
                     _errors.push_back({.model_index = index, .error = _error});
                 }
@@ -124,7 +125,7 @@ int main() {
         << _estimated_core_temperature << " C\n"
         << "selected models: "
         << _candidate_count << " / "
-        << 490 << '\n'
+        << _model_count << '\n'
         << "effective threshold: "
         << (_select_distance - _distance_increment) << '\n';
 

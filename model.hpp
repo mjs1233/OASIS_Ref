@@ -56,7 +56,10 @@ public:
 
     std::array<double,7> value{};
 
-    double operator[](size_t idx) const {
+    double operator[](std::size_t idx) const {
+        if (idx < 1 || idx > value.size()) {
+            throw std::out_of_range("param index must be 1..7");
+        }
         return value[idx - 1];
     }
 };
@@ -76,7 +79,7 @@ public:
 
     //@param : hum_air (normalized 0-1)
     double step(double temp_air,double hum_air, double q_res, double m_total, double w,double dt = 60.0) {
-
+        hum_air = std::clamp(hum_air, 0.0, 1.0);
         const double _core_signal =
             std::max(0.0, m_temp_core - m_pr[1]);
 
