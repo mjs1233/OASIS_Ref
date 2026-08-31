@@ -169,7 +169,7 @@ public:
         return m_temp_skin;
     }
 
-    static void set_body_param(body_param param) {
+    void set_body_param(body_param param) {
         body = param;
     }
 
@@ -181,7 +181,7 @@ private:
     double m_temp_skin_delta{};
     double m_error_sum {};
 
-    static inline body_param body {};
+    body_param body {};
 
 };
 
